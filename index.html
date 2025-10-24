@@ -11,8 +11,8 @@
 </head>
 
 <body>
-  <!-- Navigation -->
-  <header class="nav">
+   <!-- Navigation -->
+ <header class="nav">
     <div class="nav-inner">
       <div class="brand">
         <img src="logo.png" alt="Polfume Logo">
@@ -31,6 +31,16 @@
       </button>
     </div>
   </header>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const mainMenu = document.getElementById('mainMenu');
+
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      mainMenu.classList.toggle('active');
+    });
+  </script>
 
  <main id="index">
   <!-- Hero -->
