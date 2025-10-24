@@ -13,16 +13,106 @@ body {
 }
 
 /* --- Navigation Bar --- */
-.nav {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background: linear-gradient(90deg, #000, #1a1a1a, #000);
-  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
-  z-index: 1000;
-  backdrop-filter: blur(6px);
-}
+    .nav {
+      background: black;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+    }
 
+    .nav-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand img {
+      width: 40px;
+      height: 40px;
+    }
+
+    .menu {
+      display: flex;
+      gap: 25px;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .menu a:hover {
+      color: #d47fa6;
+    }
+
+    /* Hamburger Icon */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 25px;
+      height: 18px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      display: block;
+      height: 3px;
+      width: 100%;
+      background: #333;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .menu {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: white;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+        display: none;
+      }
+
+      .menu.active {
+        display: flex;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+    }
+
+    /* Animation for X icon */
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translateY(7px);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translateY(-7px);
+    }
 html {
   scroll-behavior: smooth;
 }
