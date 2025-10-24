@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Polfume — Perfume Boutique</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/jpeg" href="logo.jpg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="home.css">
+</head>
+
+<body>
+  <!-- Navigation -->
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <img src="logo.png" alt="Polfume Logo">
+        <h1>Polfume</h1>
+      </div>
+
+      <nav class="menu" id="mainMenu">
+        <a href="#index">Home</a>
+        <a href="#featured">Products</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+ <main id="index">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-left fade-in-left">
+      <div class="kicker">New Collection</div>
+      <h2>Whispers of Dawn — A Fragrance Collection</h2>
+      <p>Discover soft floral notes blended with warm amber and soft musk. Crafted for those who love subtle yet memorable scents.</p>
+      <a class="cta" href="#featured">Shop the Collection</a>
+    </div>
+
+    <aside class="hero-card fade-in-right">
+      <div class="perfume-photo" style="background-image:url('Men/expensive.jpg');"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+        <div>
+          <div style="font-weight:600;color:#2e2b29;">Whispers of Dawn</div>
+          <div style="font-size:13px;color:#7a6a5f;">Eau de Parfum • 50ml</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="price">$79</div>
+          <div style="font-size:12px;color:#8a7766;">Free shipping over $50</div>
+        </div>
+      </div>
+    </aside>
+  </section>
+</main>
+
+
+<section id="featured" class="section">
+  <h3 class="category-title">Men’s Perfumes</h3>
+  <div class="grid" id="productGridMen"></div>
+  <div class="pagination">
+    <button class="page-btn" id="prevBtnMen">Previous</button>
+    <span class="page-number" id="pageNumberMen">Page 1 of 3</span>
+    <button class="page-btn" id="nextBtnMen">Next</button>
+  </div>
+</section>
+
+<section class="section">
+  <h3 class="category-title">Women’s Perfumes</h3>
+  <div class="grid" id="productGridWomen"></div>
+  <div class="pagination">
+    <button class="page-btn" id="prevBtnWomen">Previous</button>
+    <span class="page-number" id="pageNumberWomen">Page 1 of 3</span>
+    <button class="page-btn" id="nextBtnWomen">Next</button>
+  </div>
+</section>
+
+<!-- Product Modal -->
+<div id="productModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <img id="modalImage" class="modal-img" alt="">
+    <h2 id="modalTitle"></h2>
+    <p id="modalDesc"></p>
+    <p id="modalPrice"></p>
+    
+    <div class="rating">
+      <span class="star" data-value="1">★</span>
+      <span class="star" data-value="2">★</span>
+      <span class="star" data-value="3">★</span>
+      <span class="star" data-value="4">★</span>
+      <span class="star" data-value="5">★</span>
+    </div>
+
+    <textarea id="commentBox" placeholder="Leave your comment..." rows="4"></textarea>
+    <button id="submitFeedback">Submit</button>
+
+    <div id="feedbackList"></div>
+  </div>
+</div>
+
+<script>
+  function setupPagination(products, gridId, pageLabelId, prevBtnId, nextBtnId) {
+    let currentPage = 1;
+    const itemsPerPage = 4;
+    const totalPages = Math.ceil(products.length / itemsPerPage);
+    const grid = document.getElementById(gridId);
+    const pageLabel = document.getElementById(pageLabelId);
+    const prevBtn = document.getElementById(prevBtnId);
+    const nextBtn = document.getElementById(nextBtnId);
+
+    function fadeOutIn(callback) {
+      grid.classList.add("fade-out");
+      setTimeout(() => {
+        callback();
+        grid.classList.remove("fade-out");
+        grid.classList.add("fade-in");
+        setTimeout(() => grid.classList.remove("fade-in"), 400);
+      }, 300);
+    }
+
+    function display(page) {
+      grid.innerHTML = "";
+      const start = (page - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+      const paginated = products.slice(start, end);
+      paginated.forEach((p, i) => {
+        grid.innerHTML += `
+          <article class="card" data-index="${start + i}">
+            <img class="product-photo" src="${p.img}" alt="${p.title}">
+            <div class="product-title">${p.title}</div>
+            <div class="product-desc">${p.desc}</div>
+            <div class="product-footer">
+              <div class="price-small">${p.price}</div>
+              <div class="btn-group">
+                <button class="btn-add">Add to Cart</button>
+                <button class="btn-buy">Buy Now</button>
+              </div>
+            </div>
+          </article>`;
+      });
+      pageLabel.textContent = `Page ${page} of ${totalPages}`;
+
+      document.querySelectorAll(`#${gridId} .card`).forEach(card => {
+        card.addEventListener("click", () => openModal(products[card.dataset.index]));
+      });
+    }
+
+    nextBtn.addEventListener("click", () => {
+      if (currentPage < totalPages)
+        fadeOutIn(() => {
+          currentPage++;
+          display(currentPage);
+        });
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 1)
+        fadeOutIn(() => {
+          currentPage--;
+          display(currentPage);
+        });
+    });
+
+    display(currentPage);
+  }
+
+  
+    /* MEN'S PERFUME COLLECTION*/
+
+ const productsMen = [
+    { img: "Men/Adidas Ice Dive (New Packaging) 100ml.webp", title: "Ocean Mist", desc: "Cool aquatic notes with hints of citrus.", price: "$65" },
+    { img: "Men/Adidas Pure Game (New Packaging) 100ml.webp", title: "Midnight Wood", desc: "Smoky wood and amber tones.", price: "$85" },
+    { img: "Men/Adidas Victory League (New Packaging) 100ml.webp", title: "Royal Oud", desc: "Luxurious oud and spice blend.", price: "$99" },
+    { img: "Men/Bvlgari Pour Homme 100ml.webp", title: "Fresh Horizon", desc: "Clean and crisp summer scent.", price: "$70" },
+    { img: "Men/Calvin Klein Escape Men 100ml.webp", title: "Cedar Trail", desc: "Earthy cedarwood and musk.", price: "$80" },
+    { img: "Men/Calvin Klein Eternity Aqua Men 100ml.webp", title: "Steel Essence", desc: "Modern metallic and bergamot.", price: "$75" },
+    { img: "Men/Calvin Klein Eternity Men EDT 100ml.webp", title: "Amber Pulse", desc: "Strong masculine amber scent.", price: "$78" },
+    { img: "Men/Carolina Herrera 212 Men NYC.webp", title: "Musk King", desc: "Classic musk and spice notes.", price: "$82" },
+    { img: "Men/Christian Dior Sauvage EDT for Men 100ml.webp", title: "Silver Rain", desc: "Fresh scent with citrus undertone.", price: "$69" },
+    { img: "Men/Clinique Happy Men 100ml.webp", title: "Iron Shadow", desc: "Bold and confident woody base.", price: "$95" },
+    { img: "Men/Coach New York For Men EDT 100ml.webp", title: "Urban Mist", desc: "Modern scent with floral undertone.", price: "$88" },
+    { img: "Men/Hugo Boss Boss Bottled EDT for Men 100ml.webp", title: "Night Armor", desc: "Deep evening scent with musk.", price: "$90" }
+  ];
+
+  const productsWomen = [
+    { img: "Women/Bath & Body Works Cucumber Melon Fragrance Mist 236ml.webp", title: "Bloom Essence", desc: "Floral bouquet with jasmine and rose.", price: "$79" },
+    { img: "Women/Bath & Body Works Japanese Cherry Blossom Fragrance Mist 236ml.webp", title: "Velvet Amber", desc: "Warm amber and vanilla blend.", price: "$89" },
+    { img: "Women/Benetton Inferno Pink 100ml.avif", title: "Pink Whisper", desc: "Delicate fruity floral scent.", price: "$69" },
+    { img: "Women/Burberry Weekend Women EDP 100ml.webp", title: "Golden Aura", desc: "Elegant scent with white musk.", price: "$95" },
+    { img: "Women/Calvin Klein CK BE 200ml.webp", title: "Pearl Mist", desc: "Light and airy floral freshness.", price: "$72" },
+    { img: "Women/Davidoff Cool Water Sea Rose 100ml.webp", title: "Enchanted Rose", desc: "Deep rose with soft powder finish.", price: "$85" },
+    { img: "Women/Davidoff Cool Water Women EDT 100ml.webp", title: "Dream Petals", desc: "Soft and dreamy floral scent.", price: "$77" },
+    { img: "Women/Dolce & Gabbana Light Blue Women 100ml.avif", title: "Luna Bloom", desc: "Moonlit floral essence.", price: "$80" },
+    { img: "Women/Elizabeth Arden Cherry Blossom Fine Fragrance Mist Cologne 236ml.avif", title: "Jasmine Kiss", desc: "Sweet jasmine and lily scent.", price: "$83" },
+    { img: "Women/Elizabeth Arden Green Tea 100ml.avif", title: "Amber Rose", desc: "Rose mixed with vanilla warmth.", price: "$88" },
+    { img: "Women/Elizabeth Arden Sunflower EDT 100ml.webp", title: "Sugar Cloud", desc: "Light and soft candy floral mix.", price: "$79" },
+    { img: "Women/Issey Miyake L'Eau D'issey Women 100ml.webp", title: "Pure Grace", desc: "Clean and graceful scent.", price: "$91" }
+  ];
+
+
+  setupPagination(productsMen, "productGridMen", "pageNumberMen", "prevBtnMen", "nextBtnMen");
+  setupPagination(productsWomen, "productGridWomen", "pageNumberWomen", "prevBtnWomen", "nextBtnWomen");
+
+  /* ==========================
+     MODAL FUNCTIONALITY
+  ========================== */
+  const modal = document.getElementById("productModal");
+  const closeModal = document.querySelector(".close-btn");
+  const modalImage = document.getElementById("modalImage");
+  const modalTitle = document.getElementById("modalTitle");
+  const modalDesc = document.getElementById("modalDesc");
+  const modalPrice = document.getElementById("modalPrice");
+  const stars = document.querySelectorAll(".star");
+  const commentBox = document.getElementById("commentBox");
+  const feedbackList = document.getElementById("feedbackList");
+  const submitFeedback = document.getElementById("submitFeedback");
+
+  let selectedRating = 0;
+
+  stars.forEach(star => {
+    star.addEventListener("click", () => {
+      selectedRating = star.dataset.value;
+      stars.forEach(s => s.classList.remove("selected"));
+      for (let i = 0; i < selectedRating; i++) stars[i].classList.add("selected");
+    });
+  });
+
+  function openModal(product) {
+    modal.style.display = "block";
+    modalImage.src = product.img;
+    modalTitle.textContent = product.title;
+    modalDesc.textContent = product.desc;
+    modalPrice.textContent = product.price;
+    commentBox.value = "";
+    selectedRating = 0;
+    stars.forEach(s => s.classList.remove("selected"));
+  }
+
+  closeModal.addEventListener("click", () => (modal.style.display = "none"));
+  window.addEventListener("click", e => {
+    if (e.target === modal) modal.style.display = "none";
+  });
+
+  submitFeedback.addEventListener("click", () => {
+    const comment = commentBox.value.trim();
+    if (selectedRating === 0 || !comment) {
+      alert("Please select a rating and add a comment.");
+      return;
+    }
+    const feedback = document.createElement("div");
+    feedback.className = "feedback-item";
+    feedback.innerHTML = `<p>⭐ ${selectedRating}/5</p><p>${comment}</p>`;
+    feedbackList.appendChild(feedback);
+    commentBox.value = "";
+    selectedRating = 0;
+    stars.forEach(s => s.classList.remove("selected"));
+  });
+</script>
+
+
+
+
+
+
+
+    <!-- About Section -->
+    <section id="about" class="section about-section">
+      <h3 class="section-title">About Polfume</h3>
+      <div class="about-container">
+        <div class="about-image">
+          <img src="Men/feature.jpg" alt="Perfume Studio">
+        </div>
+        <div class="about-text">
+          <h4>Crafted with Elegance & Passion</h4>
+          <p><strong>Polfume</strong> is a boutique fragrance house that blends artisanal craftsmanship with modern sophistication. Each scent is curated to capture moments — from tranquil mornings to enchanting nights. Our passion lies in creating perfumes that speak of grace, purity, and individuality.</p>
+          <p class="about-note">Sustainably-sourced • Cruelty-free • Made with heart</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact + Why Choose Us -->
+    <section id="contact" class="section contact-section">
+      <h3 class="section-title">Contact Us</h3>
+      <div class="contact-container">
+        <div class="contact-info">
+          <h4>We’d Love to Hear From You</h4>
+          <p>Whether you have a question about our scents, shipping, or anything else, our team is here to help. Reach out and we’ll respond within 24 hours.</p>
+
+          <ul>
+            <li><strong>Email:</strong>polfume@gmail.com</li>
+            <li><strong>Phone:</strong> +63 912 345 6789</li>
+            <li><strong>Follow Us:</strong></li>
+          </ul>
+
+          <div class="social-icons">
+            <a href="https://www.instagram.com/" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://www.facebook.com/" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.tiktok.com/" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+          </div>
+        </div>
+
+       
+      </div>
+
+      <div class="why-choose">
+        <h3 class="sub-title">Why Choose Us?</h3>
+        <div class="why-grid">
+          <div class="why-card">
+            <i class="fas fa-leaf"></i>
+            <h4>Natural Ingredients</h4>
+            <p>We use premium, eco-friendly fragrances crafted from nature.</p>
+          </div>
+          <div class="why-card">
+            <i class="fas fa-magic"></i>
+            <h4>Elegant Design</h4>
+            <p>Our perfumes are as beautiful as they smell — made to impress.</p>
+          </div>
+          <div class="why-card">
+            <i class="fas fa-heart"></i>
+            <h4>Customer Love</h4>
+            <p>Thousands of happy customers trust our timeless scents.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div>© <strong>Polfume</strong> • Crafted with care • All rights reserved</div>
+    </footer>
+  </main>
+
+
+</body>
+</html>
